@@ -21,8 +21,8 @@ type Generator struct {
 	pkg *Package // Package we are scanning.
 }
 
-// files collects all .go file names in current directory,
-// ignores _test.go files
+// files collects all .go file names in directory dir,
+// *_test.go files are ignored
 func files(dir string) []string {
 	pkg, err := build.Default.ImportDir(dir, 0)
 	if err != nil {
