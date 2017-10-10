@@ -10,6 +10,7 @@ package enumer
 import (
 	"fmt"
 	"go/ast"
+	"go/build"
 	"go/parser"
 	"go/token"
 	"log"
@@ -18,6 +19,23 @@ import (
 
 type Generator struct {
 	pkg *Package // Package we are scanning.
+}
+
+// files collects all .go file names in current directory,
+// ignores _test.go files
+func files(dir string) []string {
+	pkg, err := build.Default.ImportDir(dir, 0)
+	if err != nil {
+		log.Fatalf("cannot process %q: %s", dir, err)
+	}
+	if dir == "." {
+		return pkg.GoFiles
+	}
+	fl := make([]string, len(pkg.GoFiles))
+	for i := range pkg.GoFiles {
+		fl[i] = dir + "/" + pkg.GoFiles[i]
+	}
+	return fl
 }
 
 func (g *Generator) parse(dir string) {
@@ -42,7 +60,7 @@ func (g *Generator) parse(dir string) {
 		)
 	}
 	if len(g.pkg.files) == 0 {
-		log.Fatalf("no buildable Go files in current dir")
+		log.Fatalf("no buildable Go files in %q", dir)
 	}
 	g.pkg.name = g.pkg.files[0].ast.Name.Name
 	g.pkg.check(fs)
