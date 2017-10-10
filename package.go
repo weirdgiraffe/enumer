@@ -9,7 +9,6 @@ package enumer
 
 import (
 	"go/ast"
-	"go/build"
 	"go/constant"
 	"go/importer"
 	"go/token"
@@ -45,23 +44,6 @@ type Constant struct {
 type OutputFile struct {
 	Package string
 	Cmd     string
-}
-
-// files collects all .go file names in current directory,
-// ignores _test.go files
-func files(dir string) []string {
-	pkg, err := build.Default.ImportDir(dir, 0)
-	if err != nil {
-		log.Fatalf("cannot process current dir: %s", err)
-	}
-	if dir == "." {
-		return pkg.GoFiles
-	}
-	fl := make([]string, len(pkg.GoFiles))
-	for i := range pkg.GoFiles {
-		fl[i] = dir + "/" + pkg.GoFiles[i]
-	}
-	return fl
 }
 
 func (f *PackageFile) constantsOfType(typeName string) func(ast.Node) bool {
